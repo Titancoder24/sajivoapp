@@ -1,0 +1,17 @@
+{
+  "name": "Sajivo",
+  "short_name": "Sajivo",
+  "description": "Interior project marketplace for customers, designers, and contractors.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f8f6",
+  "theme_color": "#c65d47",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

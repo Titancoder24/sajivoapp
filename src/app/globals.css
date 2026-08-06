@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  --rv-bg: #f8f8f6;
+  --rv-surface: #ffffff;
+  --rv-ink: #111111;
+  --rv-ink-2: #595959;
+  --rv-border: #e5e5e0;
+  --rv-terracotta: #c65d47;
+  --rv-terracotta-dark: #a94a37;
+  --rv-slate: #1c2a3a;
+  --rv-slate-2: #2b3c50;
+  --rv-moss: #556b58;
+  --rv-gold: #b48742;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--rv-bg);
+  color: var(--rv-ink);
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(198, 93, 71, 0.22);
+}
+
+.font-display {
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+}
+
+.rv-grid-bg {
+  background-image:
+    linear-gradient(rgba(28, 42, 58, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 42, 58, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.rv-focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.rv-focus:focus-visible {
+  outline-color: var(--rv-terracotta);
+}
+
+.micro-rise {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.micro-rise:hover {
+  transform: translateY(-2px);
+}
+
+.page-shell {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+}
+
+.dashboard-shell {
+  width: min(1440px, calc(100vw - 24px));
+  margin: 0 auto;
+}
