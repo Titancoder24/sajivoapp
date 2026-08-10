@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronRight, Clock3, FileCheck2, IndianRupee, Info, Send, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Check, ChevronRight, Clock3, FileCheck2, IndianRupee, Info, Send, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,14 +8,16 @@ import { Input, Label, Textarea } from "@/components/ui/input";
 
 const deliverableOptions = ["Concept & mood board", "Space planning", "Detailed drawings", "Material schedule", "Site supervision"];
 
-export function ProposalForm({ label = "Submit Proposal" }: { label?: string }) {
+export function ProposalForm({ label = "Submit Proposal", estimatedRange = [950000, 1250000] }: { label?: string; estimatedRange?: [number, number] }) {
   const [amount, setAmount] = useState("850000");
   const [timeline, setTimeline] = useState("8-10 weeks");
   const [message, setMessage] = useState("I reviewed the brief and can support this scope with a clear milestone plan, transparent deliverables, and weekly updates.");
+  const [justification, setJustification] = useState("");
   const [deliverables, setDeliverables] = useState(deliverableOptions.slice(0, 4));
   const numericAmount = Number(amount.replace(/[^0-9]/g, "")) || 0;
   const platformFee = useMemo(() => Math.round(numericAmount * 0.025), [numericAmount]);
   const total = numericAmount + platformFee;
+  const quoteStatus = numericAmount > estimatedRange[1] ? "above" : numericAmount > 0 && numericAmount < estimatedRange[0] * 0.7 ? "below" : "within";
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -25,6 +27,10 @@ export function ProposalForm({ label = "Submit Proposal" }: { label?: string }) 
     }
     if (!timeline.trim() || !message.trim() || deliverables.length === 0) {
       toast.error("Complete the timeline, message, and at least one deliverable");
+      return;
+    }
+    if (quoteStatus !== "within" && justification.trim().length < 20) {
+      toast.error("Explain why this quotation is outside Sajivo’s estimated range");
       return;
     }
     toast.success(`${label} sent`);
@@ -47,6 +53,8 @@ export function ProposalForm({ label = "Submit Proposal" }: { label?: string }) 
               <div><Label htmlFor="proposal-amount">Proposal amount</Label><div className="relative"><span className="absolute left-3 top-2.5 text-sm font-semibold text-[var(--rv-ink-2)]">₹</span><Input id="proposal-amount" inputMode="numeric" className="pl-7 text-base font-semibold" value={amount} onChange={(event) => setAmount(event.target.value)} aria-describedby="amount-help" /></div><p id="amount-help" className="mt-1.5 text-xs text-[var(--rv-ink-2)]">Before applicable taxes</p></div>
               <div><Label htmlFor="proposal-timeline">Estimated timeline</Label><div className="relative"><Clock3 className="absolute left-3 top-3.5 text-[var(--rv-ink-2)]" size={16} /><Input id="proposal-timeline" className="pl-9" value={timeline} onChange={(event) => setTimeline(event.target.value)} /></div><p className="mt-1.5 text-xs text-[var(--rv-ink-2)]">Include design and execution</p></div>
             </div>
+            <div className={`mt-4 rounded-md border p-3 text-sm ${quoteStatus === "within" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-900"}`}><div className="flex gap-2">{quoteStatus === "within" ? <ShieldCheck size={17} /> : <AlertTriangle size={17} />}<span>{quoteStatus === "within" ? `Within Sajivo’s estimated range of ₹${estimatedRange[0].toLocaleString("en-IN")} – ₹${estimatedRange[1].toLocaleString("en-IN")}.` : `This quote is ${quoteStatus} Sajivo’s estimated range of ₹${estimatedRange[0].toLocaleString("en-IN")} – ₹${estimatedRange[1].toLocaleString("en-IN")}.`}</span></div></div>
+            {quoteStatus !== "within" && <div className="mt-4"><Label htmlFor="quote-justification">Why is this quote outside the estimated range?</Label><Textarea id="quote-justification" value={justification} onChange={(event) => setJustification(event.target.value)} placeholder="Explain specification changes, site conditions, exclusions, or other factors..." className="min-h-24" /></div>}
           </section>
 
           <section aria-labelledby="deliverables-title">

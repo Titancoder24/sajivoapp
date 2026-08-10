@@ -23,6 +23,7 @@ import {
   User,
   UserRoundCheck,
   ShoppingBag,
+  Calculator,
 } from "lucide-react";
 import { BrandMark } from "@/components/sajivo/BrandMark";
 import { roleLabels } from "@/lib/constants";
@@ -44,6 +45,7 @@ const iconMap = {
   quotations: ReceiptText,
   orders: ShoppingBag,
   catalog: FolderOpen,
+  estimator: Calculator,
 };
 
 function linksFor(role: UserRole) {
@@ -52,6 +54,7 @@ function linksFor(role: UserRole) {
     return [
       ["overview", "Overview", base],
       ["projects", "Projects", `${base}/projects`],
+      ["estimator", "Budget estimator", `${base}/estimator`],
       ["discover", "Find professionals", "/professionals"],
       ["messages", "Messages", `${base}/messages`],
       ["saved", "Saved", `${base}/saved`],
