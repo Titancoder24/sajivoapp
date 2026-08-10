@@ -6,6 +6,7 @@ export const roleLabels: Record<UserRole, string> = {
   customer: "Customer",
   designer: "Interior Designer",
   contractor: "Execution Contractor",
+  vendor: "Retail Vendor",
   admin: "Admin",
 };
 
@@ -13,6 +14,7 @@ export const roleDashboardPath: Record<UserRole, string> = {
   customer: "/customer/dashboard",
   designer: "/designer/dashboard",
   contractor: "/contractor/dashboard",
+  vendor: "/vendor/dashboard",
   admin: "/dashboard",
 };
 

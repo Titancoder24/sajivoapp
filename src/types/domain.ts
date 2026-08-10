@@ -1,4 +1,8 @@
-export type UserRole = "customer" | "designer" | "contractor" | "admin";
+export type UserRole = "customer" | "designer" | "contractor" | "vendor" | "admin";
+
+export type AccountType = "client" | "business";
+export type BusinessAccountType = "professional" | "vendor";
+export type PhaseOneBusinessRole = "interior_designer" | "contractor" | "retailer";
 
 export type ProjectStatus =
   | "draft"
@@ -28,6 +32,9 @@ export type Profile = {
   email: string;
   primaryRole: UserRole;
   roles: UserRole[];
+  accountType?: AccountType;
+  businessAccountType?: BusinessAccountType;
+  businessRole?: PhaseOneBusinessRole;
   city?: string;
   state?: string;
   bio?: string;

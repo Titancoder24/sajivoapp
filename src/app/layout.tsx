@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { PwaRegister } from "@/components/sajivo/PwaRegister";
+import { SoundExperience } from "@/components/sajivo/SoundExperience";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning>
       <body className={`${manrope.variable} antialiased`}>
         {children}
+        <SoundExperience />
         <PwaRegister />
         <Toaster />
       </body>

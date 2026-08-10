@@ -2,9 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, BriefcaseBusiness, CheckCircle2, ClipboardList, FolderOpen, LayoutDashboard, LogOut, MessageCircle, Search, Settings, Star, User, UserRoundCheck } from "lucide-react";
+import {
+  Bell,
+  BriefcaseBusiness,
+  CheckCircle2,
+  ChevronDown,
+  ClipboardList,
+  FolderOpen,
+  HelpCircle,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  MessageCircle,
+  PackageSearch,
+  Plus,
+  ReceiptText,
+  Search,
+  Settings,
+  Star,
+  User,
+  UserRoundCheck,
+  ShoppingBag,
+} from "lucide-react";
 import { BrandMark } from "@/components/sajivo/BrandMark";
-import { ButtonLink } from "@/components/ui/button";
 import { roleLabels } from "@/lib/constants";
 import { cn, initials } from "@/lib/utils";
 import type { UserRole } from "@/types/domain";
@@ -18,11 +38,12 @@ const iconMap = {
   portfolio: Star,
   verifications: CheckCircle2,
   messages: MessageCircle,
-  notifications: Bell,
-  profile: User,
-  settings: Settings,
   saved: UserRoundCheck,
   reviews: Star,
+  opportunities: PackageSearch,
+  quotations: ReceiptText,
+  orders: ShoppingBag,
+  catalog: FolderOpen,
 };
 
 function linksFor(role: UserRole) {
@@ -30,73 +51,148 @@ function linksFor(role: UserRole) {
   if (role === "customer") {
     return [
       ["overview", "Overview", base],
-      ["projects", "My Projects", `${base}/projects`],
-      ["discover", "Find Professionals", "/professionals"],
-      ["proposals", "My Proposals", `${base}/projects`],
+      ["projects", "Projects", `${base}/projects`],
+      ["discover", "Find professionals", "/professionals"],
       ["messages", "Messages", `${base}/messages`],
-      ["saved", "Saved Professionals", `${base}/saved`],
+      ["saved", "Saved", `${base}/saved`],
       ["reviews", "Reviews", `${base}/reviews`],
+    ] as const;
+  }
+  if (role === "vendor") {
+    return [
+      ["overview", "Overview", base],
+      ["opportunities", "Enquiries", `${base}/opportunities`],
+      ["quotations", "Quotations", `${base}/quotations`],
+      ["orders", "Orders", `${base}/orders`],
+      ["catalog", "Product catalog", `${base}/catalog`],
+      ["verifications", "Verification", `${base}/verifications`],
+      ["messages", "Messages", `${base}/messages`],
     ] as const;
   }
   return [
     ["overview", "Overview", base],
-    ["discover", "Discover Projects", `${base}/discover`],
-    ["proposals", role === "designer" ? "My Proposals" : "My Quotations", role === "designer" ? `${base}/proposals` : `${base}/quotations`],
-    ["active", "Active Projects", `${base}/active`],
+    ["discover", "Discover", `${base}/discover`],
+    ["proposals", role === "designer" ? "Proposals" : "Quotations", role === "designer" ? `${base}/proposals` : `${base}/quotations`],
+    ["active", "Active projects", `${base}/active`],
     ["portfolio", "Portfolio", `${base}/portfolio`],
     ["verifications", "Verifications", `${base}/verifications`],
     ["messages", "Messages", `${base}/messages`],
   ] as const;
 }
 
-export function DashboardShell({ role, children }: { role: UserRole; children: React.ReactNode }) {
+function isActive(pathname: string, href: string, dashboardRoot: string) {
+  if (href === dashboardRoot) return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function DashboardShell({ role, children, userName: suppliedUserName, businessName: suppliedBusinessName, unreadNotifications = 0 }: { role: UserRole; children: React.ReactNode; userName?: string; businessName?: string; unreadNotifications?: number }) {
   const pathname = usePathname();
-  const userName = role === "customer" ? "Aarav Sharma" : role === "designer" ? "Meera Iyer" : "Kabir Khan";
+  const userName = suppliedUserName ?? "Sajivo member";
+  const businessName = suppliedBusinessName ?? (role === "customer" ? "Homeowner workspace" : `${roleLabels[role]} workspace`);
   const navLinks = linksFor(role);
+  const root = `/${role}/dashboard`;
+  const quickAction = role === "customer" ? "/customer/dashboard/projects/new" : role === "vendor" ? `${root}/catalog` : `${root}/discover`;
+  const mobileLinks = role === "customer"
+    ? [navLinks[0], navLinks[1], navLinks[2], navLinks[3]]
+    : [navLinks[0], navLinks[1], navLinks[2], navLinks[3]];
 
   return (
-    <div className="min-h-screen bg-[var(--rv-bg)]">
-      <div className="dashboard-shell grid min-h-screen gap-4 py-4 lg:grid-cols-[280px_1fr]">
-        <aside className="rounded-lg border border-[var(--rv-border)] bg-white p-4 lg:sticky lg:top-4 lg:h-[calc(100vh-32px)]">
-          <div className="flex items-center justify-between">
-            <BrandMark />
-            <span className="rounded-full bg-[rgba(198,93,71,0.08)] px-2 py-1 text-xs font-bold text-[var(--rv-terracotta)]">PWA</span>
-          </div>
-          <div className="mt-6 rounded-lg bg-[var(--rv-bg)] p-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[var(--rv-slate)] text-sm font-bold text-white">{initials(userName)}</div>
-              <div>
-                <p className="text-sm font-bold">{userName}</p>
-                <p className="text-xs text-[var(--rv-ink-2)]">{roleLabels[role]}</p>
-              </div>
-            </div>
-          </div>
-          <nav className="mt-5 grid gap-1">
+    <div className="min-h-screen bg-[#f7f7f8] text-[#202124]">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[236px] flex-col border-r border-[#e6e7e9] bg-[#fbfbfc] lg:flex">
+        <div className="flex h-16 items-center border-b border-[#e6e7e9] px-5">
+          <BrandMark />
+        </div>
+
+        <div className="px-3 py-3">
+          <button className="rv-focus flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-[#f0f0f2]">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#1f2937] text-xs font-bold text-white">{initials(businessName)}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">{businessName}</span>
+              <span className="block truncate text-[11px] text-[#7a7d82]">{roleLabels[role]}</span>
+            </span>
+            <ChevronDown size={14} className="text-[#8b8d92]" />
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 pb-4">
+          <p className="px-2 pb-2 pt-1 text-[10px] font-bold uppercase tracking-wider text-[#9a9ca1]">Workspace</p>
+          <div className="space-y-0.5">
             {navLinks.map(([key, label, href]) => {
               const Icon = iconMap[key];
-              const active = pathname === href;
+              const active = isActive(pathname, href, root);
               return (
-                <Link key={href} href={href} className={cn("rv-focus flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)] hover:text-[var(--rv-ink)]", active && "bg-[rgba(198,93,71,0.08)] text-[var(--rv-terracotta-dark)]")}>
-                  <Icon size={17} />
-                  {label}
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "rv-focus group flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] font-medium text-[#5f6368] transition-colors hover:bg-[#f0f0f2] hover:text-[#202124]",
+                    active && "bg-[#ececef] font-semibold text-[#202124]",
+                  )}
+                >
+                  <Icon size={16} strokeWidth={active ? 2.3 : 1.8} />
+                  <span className="truncate">{label}</span>
+                  {key === "messages" && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--rv-terracotta)]" />}
                 </Link>
               );
             })}
-            <Link href="/notifications" className="rv-focus flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]">
-              <Bell size={17} />
-              Notifications
-              <span className="ml-auto rounded-full bg-[var(--rv-terracotta)] px-2 py-0.5 text-xs text-white">2</span>
+          </div>
+
+          <p className="mt-6 px-2 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#9a9ca1]">Account</p>
+          <div className="space-y-0.5">
+            <Link href="/notifications" className="rv-focus flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] font-medium text-[#5f6368] hover:bg-[#f0f0f2] hover:text-[#202124]">
+              <Bell size={16} /><span>Notifications</span>{unreadNotifications > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#202124] px-1.5 text-[10px] font-bold text-white">{unreadNotifications}</span>}
             </Link>
-            <Link href="/profile" className="rv-focus flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]"><User size={17} /> Profile</Link>
-            <Link href="/settings" className="rv-focus flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]"><Settings size={17} /> Settings</Link>
-          </nav>
-          <ButtonLink href="/login" variant="outline" className="mt-5 w-full">
-            <LogOut size={16} />
-            Logout
-          </ButtonLink>
-        </aside>
-        <main className="min-w-0 pb-10">{children}</main>
+            <Link href="/profile" className="rv-focus flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] font-medium text-[#5f6368] hover:bg-[#f0f0f2] hover:text-[#202124]"><User size={16} />Profile</Link>
+            <Link href="/settings" className="rv-focus flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] font-medium text-[#5f6368] hover:bg-[#f0f0f2] hover:text-[#202124]"><Settings size={16} />Settings</Link>
+          </div>
+        </nav>
+
+        <div className="border-t border-[#e6e7e9] p-3">
+          <Link href="/how-it-works" className="flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] text-[#6f7277] hover:bg-[#f0f0f2]"><HelpCircle size={16} />Help & support</Link>
+          <Link href="/login" className="flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] text-[#6f7277] hover:bg-[#f0f0f2]"><LogOut size={16} />Log out</Link>
+        </div>
+      </aside>
+
+      <div className="min-w-0 lg:pl-[236px]">
+        <header className="sticky top-0 z-30 flex h-16 items-center border-b border-[#e6e7e9] bg-white/95 px-4 backdrop-blur md:px-6 lg:px-8">
+          <div className="flex items-center gap-3 lg:hidden"><BrandMark /></div>
+          <div className="ml-auto flex items-center gap-1.5 lg:ml-0 lg:w-full">
+            <button className="rv-focus hidden h-9 max-w-[360px] flex-1 items-center gap-2 rounded-md border border-[#dedfe2] bg-[#fafafa] px-3 text-left text-sm text-[#8a8d91] lg:flex">
+              <Search size={15} /><span>Search projects, people, files...</span><kbd className="ml-auto rounded border border-[#ddd] bg-white px-1.5 py-0.5 text-[10px]">⌘ K</kbd>
+            </button>
+            <div className="lg:ml-auto" />
+            <Link href="/notifications" aria-label="Notifications" className="rv-focus relative flex h-9 w-9 items-center justify-center rounded-md text-[#5f6368] hover:bg-[#f2f2f3]">
+              <Bell size={18} />{unreadNotifications > 0 && <span className="absolute right-2 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--rv-terracotta)] ring-2 ring-white" />}
+            </Link>
+            <Link href={quickAction} className="rv-focus ml-1 inline-flex h-9 items-center gap-2 rounded-md bg-[#202124] px-3 text-xs font-semibold text-white shadow-sm hover:bg-black">
+              <Plus size={15} /> <span className="hidden sm:inline">{role === "customer" ? "New project" : role === "vendor" ? "Add product" : "Find work"}</span>
+            </Link>
+            <button aria-label="Open menu" className="rv-focus flex h-9 w-9 items-center justify-center rounded-md text-[#5f6368] hover:bg-[#f2f2f3] lg:hidden"><Menu size={19} /></button>
+            <div className="ml-1 hidden items-center gap-2 border-l border-[#e5e5e5] pl-3 sm:flex">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e8e1dc] text-[11px] font-bold text-[#563d31]">{initials(userName)}</div>
+            </div>
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-[1500px] px-4 pb-28 pt-6 md:px-6 md:pb-10 md:pt-7 lg:px-8">{children}</main>
       </div>
+
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid h-[68px] grid-cols-5 border-t border-[#dedfe2] bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+        {mobileLinks.map(([key, label, href]) => {
+          const Icon = iconMap[key];
+          const active = isActive(pathname, href, root);
+          const mobileLabel = key === "overview" ? "Home" : key === "discover" ? (role === "customer" ? "Find" : "Discover") : key === "proposals" ? (role === "designer" ? "Proposals" : "Quotes") : label;
+          return (
+            <Link key={href} href={href} className={cn("rv-focus flex min-w-0 flex-col items-center justify-center gap-1 text-[10px] font-medium text-[#777a7f]", active && "text-[var(--rv-terracotta-dark)]")}>
+              <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
+              <span className="max-w-full truncate">{mobileLabel}</span>
+            </Link>
+          );
+        })}
+        <Link href="/profile" className={cn("rv-focus flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-[#777a7f]", pathname === "/profile" && "text-[var(--rv-terracotta-dark)]")}>
+          <User size={20} /><span>Profile</span>
+        </Link>
+      </nav>
     </div>
   );
 }

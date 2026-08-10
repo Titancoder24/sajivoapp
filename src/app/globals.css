@@ -1,17 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --rv-bg: #f8f8f6;
+  --rv-bg: #f7f7f5;
   --rv-surface: #ffffff;
-  --rv-ink: #111111;
-  --rv-ink-2: #595959;
-  --rv-border: #e5e5e0;
-  --rv-terracotta: #c65d47;
-  --rv-terracotta-dark: #a94a37;
-  --rv-slate: #1c2a3a;
-  --rv-slate-2: #2b3c50;
-  --rv-moss: #556b58;
-  --rv-gold: #b48742;
+  --rv-surface-muted: #f1f2ef;
+  --rv-ink: #171a17;
+  --rv-ink-2: #626861;
+  --rv-ink-3: #8a8f89;
+  --rv-border: #dedfda;
+  --rv-border-strong: #c9cbc4;
+  --rv-terracotta: #d35f45;
+  --rv-terracotta-dark: #b74731;
+  --rv-terracotta-soft: #fff0eb;
+  --rv-slate: #202b29;
+  --rv-slate-2: #31413e;
+  --rv-moss: #40745d;
+  --rv-moss-soft: #e9f4ee;
+  --rv-gold: #a87527;
+  --rv-gold-soft: #fff6df;
+  --rv-danger: #c94343;
+  --rv-shadow-sm: 0 1px 2px rgba(17, 24, 20, 0.05), 0 1px 8px rgba(17, 24, 20, 0.03);
+  --rv-shadow-md: 0 10px 30px rgba(17, 24, 20, 0.08), 0 2px 8px rgba(17, 24, 20, 0.04);
+  --rv-shadow-lg: 0 24px 60px rgba(17, 24, 20, 0.12), 0 4px 16px rgba(17, 24, 20, 0.06);
 }
 
 * {
@@ -27,6 +37,9 @@ body {
   background: var(--rv-bg);
   color: var(--rv-ink);
   font-family: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -35,6 +48,21 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a[href] {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }
 
 ::selection {
@@ -60,22 +88,113 @@ select {
 
 .rv-focus:focus-visible {
   outline-color: var(--rv-terracotta);
+  outline-offset: 3px;
 }
 
 .micro-rise {
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease, opacity 180ms ease;
 }
 
 .micro-rise:hover {
   transform: translateY(-2px);
 }
 
+.button-3d {
+  box-shadow:
+    0 4px 0 var(--button-depth, var(--rv-border-strong)),
+    0 8px 18px rgba(17, 24, 20, 0.12);
+  transform: translateY(0);
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.button-3d:hover {
+  box-shadow:
+    0 5px 0 var(--button-depth, var(--rv-border-strong)),
+    0 10px 22px rgba(17, 24, 20, 0.15);
+  transform: translateY(-1px);
+}
+
+.button-3d:active {
+  box-shadow:
+    0 1px 0 var(--button-depth, var(--rv-border-strong)),
+    0 3px 8px rgba(17, 24, 20, 0.1);
+  transform: translateY(3px);
+}
+
+.button-3d:disabled {
+  box-shadow: none;
+  transform: none;
+}
+
+.button-depth-primary { --button-depth: #913a28; }
+.button-depth-secondary { --button-depth: #101917; }
+.button-depth-outline { --button-depth: #b7b9b2; }
+.button-depth-ghost { --button-depth: #d5d6d1; }
+.button-depth-danger { --button-depth: #8e2525; }
+
 .page-shell {
-  width: min(1180px, calc(100vw - 32px));
+  width: min(1280px, calc(100vw - 40px));
   margin: 0 auto;
 }
 
 .dashboard-shell {
-  width: min(1440px, calc(100vw - 24px));
+  width: min(1600px, calc(100vw - 24px));
   margin: 0 auto;
+}
+
+.surface-shadow {
+  box-shadow: var(--rv-shadow-sm);
+}
+
+.floating-shadow {
+  box-shadow: var(--rv-shadow-md);
+}
+
+.section-rule {
+  border-top: 1px solid var(--rv-border);
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@keyframes rv-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-enter {
+  animation: rv-enter 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@media (max-width: 767px) {
+  .page-shell,
+  .dashboard-shell {
+    width: min(100% - 28px, 1280px);
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .micro-rise:hover { transform: none; }
+  .button-3d:hover { transform: none; }
+  .button-3d:active { transform: translateY(3px); }
 }

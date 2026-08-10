@@ -1,6 +1,6 @@
 import { notifications, portfolioProjects, profiles, projects, proposals, reviews, services } from "@/lib/demo-data";
 import { createClient } from "@/lib/supabase/server";
-import type { Profile, Project, UserRole } from "@/types/domain";
+import type { Profile, Project, Proposal, UserRole } from "@/types/domain";
 
 function toProfile(row: Record<string, unknown>): Profile {
   return {
@@ -9,6 +9,9 @@ function toProfile(row: Record<string, unknown>): Profile {
     email: String(row.email ?? ""),
     primaryRole: row.primary_role as UserRole,
     roles: (row.roles as UserRole[] | null) ?? [row.primary_role as UserRole],
+    accountType: row.account_type as Profile["accountType"],
+    businessAccountType: row.business_account_type as Profile["businessAccountType"],
+    businessRole: row.business_role as Profile["businessRole"],
     city: row.city as string | undefined,
     state: row.state as string | undefined,
     bio: row.bio as string | undefined,
@@ -27,8 +30,33 @@ function toProfile(row: Record<string, unknown>): Profile {
   };
 }
 
+function toProposal(row: Record<string, unknown>): Proposal {
+  const professional = row.professional as Record<string, unknown> | null;
+  return {
+    id: String(row.id),
+    projectId: String(row.project_id),
+    customerId: String(row.customer_id),
+    professionalId: String(row.professional_id),
+    professionalRole: row.professional_role as UserRole,
+    professionalName: String(professional?.full_name ?? "Sajivo professional"),
+    status: row.status as Proposal["status"],
+    proposedAmount: row.proposed_amount as number | undefined,
+    proposedAmountMin: row.proposed_amount_min as number | undefined,
+    proposedAmountMax: row.proposed_amount_max as number | undefined,
+    estimatedTimeline: String(row.estimated_timeline ?? "To be confirmed"),
+    message: String(row.message ?? ""),
+    deliverables: (row.deliverables as string[] | null) ?? [],
+    createdAt: String(row.created_at ?? new Date().toISOString()),
+  };
+}
+
 function toProject(row: Record<string, unknown>): Project {
   const scope = (row.scope ?? {}) as Record<string, string>;
+  const aggregateCount = (value: unknown) => {
+    if (Array.isArray(value)) return Number((value[0] as { count?: number } | undefined)?.count ?? 0);
+    if (value && typeof value === "object") return Number((value as { count?: number }).count ?? 0);
+    return Number(value ?? 0);
+  };
   return {
     id: String(row.id),
     customerId: String(row.customer_id),
@@ -45,8 +73,8 @@ function toProject(row: Record<string, unknown>): Project {
     customBudget: row.custom_budget as number | undefined,
     preferredStartDate: row.preferred_start_date as string | undefined,
     expectedTimeline: row.expected_timeline as string | undefined,
-    filesCount: Number(row.files_count ?? 0),
-    proposalsCount: Number(row.proposals_count ?? 0),
+    filesCount: aggregateCount(row.files_count),
+    proposalsCount: aggregateCount(row.proposals_count),
     selectedProfessionalId: row.selected_professional_id as string | undefined,
     createdAt: String(row.created_at ?? new Date().toISOString()),
     publishedAt: row.published_at as string | undefined,
@@ -74,7 +102,7 @@ export async function getProfessionals(role?: UserRole | "all") {
   let query = supabase.from("profiles").select("*").in("primary_role", ["designer", "contractor"]).eq("account_status", "active");
   if (role && role !== "all") query = query.eq("primary_role", role);
   const { data, error } = await query.order("rating_avg", { ascending: false });
-  if (error || !data?.length) return profiles.filter((profile) => profile.primaryRole === "designer" || profile.primaryRole === "contractor");
+  if (error || !data) return [];
   return data.map(toProfile);
 }
 
@@ -89,16 +117,33 @@ export async function getProjectsForRole(role: UserRole) {
     ? supabase.from("projects").select("*, files_count:project_files(count), proposals_count:proposals(count)").order("created_at", { ascending: false })
     : supabase.from("projects").select("*, files_count:project_files(count), proposals_count:proposals(count)").in("status", discoverable).order("created_at", { ascending: false });
   const { data, error } = await query;
-  if (error || !data?.length) return role === "customer" ? projects : projects.filter((project) => discoverable.includes(project.status));
+  if (error || !data) return [];
   return data.map(toProject);
 }
 
 export async function getProjectById(id: string) {
-  return projects.find((project) => project.id === id) ?? projects[0];
+  const supabase = await createClient();
+  if (!supabase || id.startsWith("demo-")) return projects.find((project) => project.id === id) ?? { ...projects[0], id };
+  const { data, error } = await supabase.from("projects").select("*, files_count:project_files(count), proposals_count:proposals(count)").eq("id", id).single();
+  if (error || !data) return { ...projects[0], id };
+  return toProject(data);
 }
 
 export async function getDashboardSummary(role: UserRole) {
   const roleProjects = await getProjectsForRole(role);
+  const supabase = await createClient();
+  if (supabase) {
+    const [proposalResult, notificationResult] = await Promise.all([
+      supabase.from("proposals").select("id", { count: "exact", head: true }),
+      supabase.from("notifications").select("id", { count: "exact", head: true }).is("read_at", null),
+    ]);
+    return {
+      activeProjects: roleProjects.filter((project) => ["professional_selected", "discussion", "in_progress", "awaiting_customer_review"].includes(project.status)).length,
+      publishedProjects: roleProjects.filter((project) => ["published", "receiving_proposals", "matching"].includes(project.status)).length,
+      proposals: proposalResult.count ?? 0,
+      unreadNotifications: notificationResult.count ?? 0,
+    };
+  }
   return {
     activeProjects: roleProjects.filter((project) => ["professional_selected", "discussion", "in_progress", "awaiting_customer_review"].includes(project.status)).length,
     publishedProjects: roleProjects.filter((project) => ["published", "receiving_proposals", "matching"].includes(project.status)).length,
@@ -108,12 +153,30 @@ export async function getDashboardSummary(role: UserRole) {
 }
 
 export async function getProposals(role: UserRole) {
-  if (role === "customer") return proposals;
-  return proposals.filter((proposal) => proposal.professionalRole === role);
+  const supabase = await createClient();
+  if (!supabase) return role === "customer" ? proposals : proposals.filter((proposal) => proposal.professionalRole === role);
+  let query = supabase.from("proposals").select("*, professional:profiles!proposals_professional_id_fkey(full_name)").order("created_at", { ascending: false });
+  if (role !== "customer" && role !== "admin") query = query.eq("professional_role", role);
+  const { data, error } = await query;
+  if (error) return [];
+  return (data ?? []).map(toProposal);
 }
 
 export async function getNotifications() {
-  return notifications;
+  const supabase = await createClient();
+  if (!supabase) return notifications;
+  const { data, error } = await supabase.from("notifications").select("*").order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return data.map((row) => ({ id: row.id, userId: row.user_id, projectId: row.project_id ?? undefined, kind: row.kind, message: row.message, readAt: row.read_at, createdAt: row.created_at }));
+}
+
+export async function getCurrentProfile() {
+  const supabase = await createClient();
+  if (!supabase) return profiles[0];
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return null;
+  const { data } = await supabase.from("profiles").select("*").eq("id", authData.user.id).single();
+  return data ? toProfile(data) : null;
 }
 
 export async function getPortfolioForProfessional(id: string) {
@@ -122,4 +185,29 @@ export async function getPortfolioForProfessional(id: string) {
 
 export async function getReviewsForProfessional(id: string) {
   return reviews.filter((review) => review.professionalId === id);
+}
+
+export type VendorDashboardData = {
+  enquiries: Array<{ id: string; subject: string; status: string; quotedAmount?: number; createdAt: string }>;
+  orders: Array<{ id: string; status: string; totalAmount: number; expectedDeliveryDate?: string; createdAt: string }>;
+  products: Array<{ id: string; name: string; category: string; price?: number; stockStatus: string }>;
+};
+
+export async function getVendorDashboardData(): Promise<VendorDashboardData> {
+  const supabase = await createClient();
+  if (!supabase) return { enquiries: [], orders: [], products: [] };
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return { enquiries: [], orders: [], products: [] };
+
+  const [enquiriesResult, ordersResult, productsResult] = await Promise.all([
+    supabase.from("vendor_enquiries").select("id, subject, status, quoted_amount, created_at").eq("vendor_id", authData.user.id).order("created_at", { ascending: false }),
+    supabase.from("vendor_orders").select("id, status, total_amount, expected_delivery_date, created_at").eq("vendor_id", authData.user.id).order("created_at", { ascending: false }),
+    supabase.from("vendor_products").select("id, name, category, price, stock_status").eq("vendor_id", authData.user.id).order("created_at", { ascending: false }),
+  ]);
+
+  return {
+    enquiries: (enquiriesResult.data ?? []).map((row) => ({ id: row.id, subject: row.subject, status: row.status, quotedAmount: row.quoted_amount ?? undefined, createdAt: row.created_at })),
+    orders: (ordersResult.data ?? []).map((row) => ({ id: row.id, status: row.status, totalAmount: Number(row.total_amount), expectedDeliveryDate: row.expected_delivery_date ?? undefined, createdAt: row.created_at })),
+    products: (productsResult.data ?? []).map((row) => ({ id: row.id, name: row.name, category: row.category, price: row.price ?? undefined, stockStatus: row.stock_status })),
+  };
 }
