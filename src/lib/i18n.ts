@@ -12,24 +12,67 @@ const hindi: Record<string, string> = {
 const instance = i18next.createInstance({ fallbackLng: "en", resources: { en: { translation: {} }, hi: { translation: hindi } }, interpolation: { escapeValue: false } });
 void instance.init();
 
-export function translatePage(language: "en" | "hi") {
-  if (language === "en") return;
-  const translate = (value: string) => instance.t(value, { lng: language }) as string;
+type SourceNode = Text | HTMLElement;
+
+function collectSourceNodes() {
+  const nodes: SourceNode[] = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const nodes: Text[] = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
-  nodes.forEach((node) => {
-    const original = node.textContent?.trim();
-    if (!original || original.length < 2 || node.parentElement?.closest("script,style")) return;
-    const translated = translate(original);
-    if (translated !== original) node.textContent = node.textContent?.replace(original, translated) ?? translated;
-  });
-  document.querySelectorAll<HTMLElement>("input,textarea,[aria-label],[title]").forEach((element) => {
+  while (walker.nextNode()) {
+    const node = walker.currentNode as Text;
+    const parent = node.parentElement;
+    const value = node.textContent?.trim();
+    if (!parent || !value || value.length < 2 || parent.closest("script,style,noscript,svg")) continue;
+    nodes.push(node);
+  }
+  document.querySelectorAll<HTMLElement>("input,textarea,[aria-label],[title]").forEach((element) => nodes.push(element));
+  return nodes;
+}
+
+function sourceValue(node: SourceNode) {
+  if (node instanceof HTMLElement) return node.getAttribute("placeholder") ?? node.getAttribute("aria-label") ?? node.getAttribute("title") ?? "";
+  return node.textContent?.trim() ?? "";
+}
+
+function setTranslatedValue(node: SourceNode, translated: string) {
+  if (node instanceof HTMLElement) {
     for (const attribute of ["placeholder", "aria-label", "title"]) {
-      const value = element.getAttribute(attribute);
-      if (!value) continue;
-      const translated = translate(value);
-      if (translated !== value) element.setAttribute(attribute, translated);
+      const original = node.getAttribute(`data-sajivo-${attribute}`);
+      if (original) node.setAttribute(attribute, translated === original ? original : translated);
     }
+    return;
+  }
+  const original = node.textContent?.trim() ?? "";
+  if (original && node.textContent) node.textContent = node.textContent.replace(original, translated);
+}
+
+async function translateUnmapped(values: string[]) {
+  if (!values.length) return new Map<string, string>();
+  try {
+    const response = await fetch("/api/translate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ texts: values }) });
+    if (!response.ok) return new Map<string, string>();
+    const payload = await response.json() as { translations?: string[] };
+    return new Map(values.map((value, index) => [value, payload.translations?.[index] ?? value]));
+  } catch {
+    return new Map<string, string>();
+  }
+}
+
+export async function translatePage(language: "en" | "hi") {
+  if (language === "en") return;
+  const nodes = collectSourceNodes();
+  const values = [...new Set(nodes.map(sourceValue).filter(Boolean))];
+  const translate = (value: string) => instance.t(value, { lng: language }) as string;
+  const unmapped = values.filter((value) => translate(value) === value && !/[\u0900-\u097F]/.test(value));
+  const remote = await translateUnmapped(unmapped);
+  nodes.forEach((node) => {
+    const value = sourceValue(node);
+    if (!value) return;
+    if (node instanceof HTMLElement) {
+      for (const attribute of ["placeholder", "aria-label", "title"]) {
+        const original = node.getAttribute(attribute);
+        if (original) node.setAttribute(`data-sajivo-${attribute}`, original);
+      }
+    }
+    setTranslatedValue(node, translate(value) === value ? (remote.get(value) ?? value) : translate(value));
   });
 }
