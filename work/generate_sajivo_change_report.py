@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "output/pdf/Sajivo_MVP_Landing_Page_Agency_Change_Request_Implementation_Report.pdf"
 OUT.parent.mkdir(parents=True, exist_ok=True)
 EVIDENCE = ROOT / "output/evidence"
+ANNOTATED = ROOT / "output/annotated-evidence"
 REFS = [
     Path('/var/folders/jb/cq_njkqx5qb013k9_fs1214c0000gn/T/TemporaryItems/NSIRD_screencaptureui_ZEfOmZ/Screenshot 2026-08-11 at 11.31.53 PM.png'),
     Path('/var/folders/jb/cq_njkqx5qb013k9_fs1214c0000gn/T/TemporaryItems/NSIRD_screencaptureui_HCsooS/Screenshot 2026-08-11 at 11.32.08 PM.png'),
@@ -59,7 +60,7 @@ for title, items in pages:
     if title.startswith('12.'):
         story.append(P('Evidence: the implementation control is visible globally in the top-right preference pill and is persisted locally.', 'Note'))
     story.append(PageBreak())
-for i, path in enumerate([EVIDENCE/'01-landing.png', EVIDENCE/'02-register.png', EVIDENCE/'03-login.png', EVIDENCE/'04-grey-theme.png', EVIDENCE/'05-dark-theme.png', EVIDENCE/'06-hindi-control.png'] + REFS):
+for i, path in enumerate([ANNOTATED/'01-landing.png', ANNOTATED/'02-register.png', ANNOTATED/'03-login.png', ANNOTATED/'04-grey-theme.png', ANNOTATED/'05-dark-theme.png', ANNOTATED/'06-hindi-control.png'] + REFS):
     if path.exists():
         story += [P(f'Appendix evidence {i+1}', 'H'), P(path.name, 'Sub'), Image(str(path), width=170*mm, height=95*mm), Spacer(1, 8), P('Annotation: captured or supplied reference evidence for the corresponding workflow and change request. Screenshots are included in this PDF appendix only.', 'Note'), PageBreak()]
 def footer(canvas, doc):
