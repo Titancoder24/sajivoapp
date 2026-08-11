@@ -2,6 +2,7 @@
 
 import { Check, Languages, Moon, Sun, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { translatePage } from "@/lib/i18n";
 
 type Theme = "light" | "grey" | "dark";
 type Language = "en" | "hi";
@@ -28,10 +29,14 @@ export function AppPreferences() {
     document.documentElement.lang = language === "hi" ? "hi" : "en";
     window.localStorage.setItem("sajivo-theme", theme);
     window.localStorage.setItem("sajivo-language", language);
+    if (language === "hi") {
+      const timer = window.setTimeout(() => translatePage("hi"), 80);
+      return () => window.clearTimeout(timer);
+    }
   }, [theme, language]);
 
   return (
-    <aside className="fixed right-3 top-3 z-[70] flex items-center gap-1 rounded-full border border-[var(--rv-border)] bg-[var(--rv-surface)]/95 p-1 shadow-lg backdrop-blur" aria-label="Appearance and language preferences">
+    <aside className="fixed right-4 top-[88px] z-[70] flex items-center gap-1 rounded-lg border border-[var(--rv-border)] bg-[var(--rv-surface)]/95 p-1 shadow-lg backdrop-blur" aria-label="Appearance and language preferences">
       <div className="flex items-center gap-0.5" role="group" aria-label="Choose theme">
         {themes.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" onClick={() => setTheme(id)} aria-label={`${label} theme`} aria-pressed={theme === id} title={`${label} theme`} className={`grid h-8 w-8 place-items-center rounded-full transition ${theme === id ? "bg-[var(--rv-terracotta)] text-white" : "text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]"}`}>
@@ -40,7 +45,7 @@ export function AppPreferences() {
         ))}
       </div>
       <span className="h-5 w-px bg-[var(--rv-border)]" aria-hidden="true" />
-      <button type="button" onClick={() => setLanguage(language === "en" ? "hi" : "en")} aria-label={`Switch language to ${language === "en" ? "Hindi" : "English"}`} title="English / Hindi" className="flex h-8 items-center gap-1 rounded-full px-2 text-xs font-bold text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]">
+      <button type="button" onClick={() => { const next = language === "en" ? "hi" : "en"; window.localStorage.setItem("sajivo-language", next); window.location.reload(); }} aria-label={`Switch language to ${language === "en" ? "Hindi" : "English"}`} title="English / Hindi" className="flex h-8 items-center gap-1 rounded-full px-2 text-xs font-bold text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]">
         <Languages size={14} /> {language === "en" ? "EN" : "हिन्दी"}
         {language === "hi" ? <Check size={12} /> : null}
       </button>
