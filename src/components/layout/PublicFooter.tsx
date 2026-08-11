@@ -3,7 +3,7 @@ import { ArrowUpRight, BriefcaseBusiness, Camera, MapPin } from "lucide-react";
 import { BrandMark } from "@/components/sajivo/BrandMark";
 
 const groups = [
-  ["Explore", [["Services", "/services"], ["Find professionals", "/professionals"], ["How it works", "/how-it-works"]]],
+  ["Explore", [["Services", "/services"], ["Find professionals", "/professionals"], ["Vendors / Businesses", "/for-professionals"], ["How Sajivo Works", "/how-it-works"]]],
   ["Professionals", [["Join Sajivo", "/for-professionals"], ["Designer account", "/register?role=designer"], ["Contractor account", "/register?role=contractor"]]],
   ["Account", [["Log in", "/login"], ["Create account", "/register"], ["Start a project", "/register?role=customer"]]],
 ] as const;
@@ -16,7 +16,7 @@ export function PublicFooter() {
           <div>
             <BrandMark />
             <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--rv-ink-2)]">A clearer way to discover trusted interior professionals and manage every decision from brief to handover.</p>
-            <p className="mt-5 flex items-center gap-2 text-sm font-semibold"><MapPin size={16} /> Built for projects across India</p>
+            <p className="mt-5 flex items-center gap-2 text-sm font-semibold"><MapPin size={16} /> Built for projects globally</p>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {groups.map(([title, items]) => (

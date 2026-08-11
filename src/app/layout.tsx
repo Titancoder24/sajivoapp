@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { PwaRegister } from "@/components/sajivo/PwaRegister";
 import { SoundExperience } from "@/components/sajivo/SoundExperience";
+import { AppPreferences } from "@/components/sajivo/AppPreferences";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning>
       <body className={`${manrope.variable} antialiased`}>
         {children}
+        <AppPreferences />
         <SoundExperience />
         <PwaRegister />
         <Toaster />

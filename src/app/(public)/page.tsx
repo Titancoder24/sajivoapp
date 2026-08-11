@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Check, ChevronRight, ClipboardCheck, MapPin, Search, ShieldCheck, Star, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, ChevronRight, ClipboardCheck, FileText, MapPin, Search, ShieldCheck, Star, Users } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { ProfessionalCard } from "@/components/sajivo/ProfessionalCard";
 import { ServiceCategoryCard } from "@/components/sajivo/ServiceCategoryCard";
@@ -21,21 +21,22 @@ export default async function LandingPage() {
           <img src="https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=2200&q=90" alt="Contemporary Indian living room interior" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-black/5" />
           <div className="relative flex min-h-[590px] max-w-3xl flex-col justify-end p-6 pb-10 text-white sm:p-10 md:min-h-[650px] md:justify-center md:p-16">
-            <div className="mb-5 flex w-fit items-center rounded-full border border-white/30 bg-black/15 px-3 py-1.5 text-xs font-bold backdrop-blur">Thoughtful interiors, trusted professionals</div>
-            <h1 className="font-display max-w-2xl text-4xl leading-[1.08] sm:text-5xl md:text-6xl">Turn your space into a home that feels like you.</h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/85 md:text-lg">Create a clear brief, compare verified designers and contractors, and manage the work in one place.</p>
+            <div className="mb-5 flex w-fit items-center rounded-full border border-white/30 bg-black/15 px-3 py-1.5 text-xs font-bold backdrop-blur">A clearer way to build, renovate and manage your project</div>
+            <h1 className="font-display max-w-2xl text-4xl leading-[1.08] sm:text-5xl md:text-6xl">Build, renovate and transform your space — with everyone on the same page.</h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/85 md:text-lg">Tell us what you need, discover relevant professionals and suppliers, compare proposals, and manage your project from start to completion.</p>
 
             <form action="/professionals" className="mt-8 grid max-w-2xl overflow-hidden rounded-lg bg-white p-2 text-[var(--rv-ink)] shadow-2xl sm:grid-cols-[1fr_1fr_auto] sm:rounded-full">
               <label className="flex items-center gap-3 px-4 py-3 sm:border-r sm:border-[var(--rv-border)]">
                 <Search size={18} className="text-[var(--rv-terracotta)]" />
-                <span className="min-w-0"><span className="block text-[11px] font-bold uppercase text-[var(--rv-ink-2)]">What do you need?</span><input name="q" placeholder="Kitchen, designer..." className="w-full bg-transparent text-sm font-semibold outline-none placeholder:font-normal" /></span>
+                <span className="min-w-0"><span className="block text-[11px] font-bold uppercase text-[var(--rv-ink-2)]">What do you need?</span><input name="q" placeholder="Designer, contractor, kitchen renovation..." className="w-full bg-transparent text-sm font-semibold outline-none placeholder:font-normal" /></span>
               </label>
               <label className="flex items-center gap-3 border-t border-[var(--rv-border)] px-4 py-3 sm:border-0">
                 <MapPin size={18} className="text-[var(--rv-terracotta)]" />
                 <span className="min-w-0"><span className="block text-[11px] font-bold uppercase text-[var(--rv-ink-2)]">Where?</span><input name="city" placeholder="Bengaluru" className="w-full bg-transparent text-sm font-semibold outline-none placeholder:font-normal" /></span>
               </label>
-              <button className="button-3d button-depth-primary rv-focus flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--rv-terracotta)] px-6 font-semibold text-white hover:bg-[var(--rv-terracotta-dark)] sm:h-auto sm:rounded-full" type="submit"><Search size={18} /> Search</button>
+              <button className="button-3d button-depth-primary rv-focus flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--rv-terracotta)] px-6 font-semibold text-white hover:bg-[var(--rv-terracotta-dark)] sm:h-auto sm:rounded-full" type="submit"><Search size={18} /> Find Professionals</button>
             </form>
+            <ButtonLink href="/register" className="button-3d button-depth-outline mt-3 w-fit rounded-full border border-white/50 bg-white px-5 text-[var(--rv-ink)]">Start a Project <ArrowRight size={16} /></ButtonLink>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-white/90">
               <span className="flex items-center gap-1.5"><BadgeCheck size={16} /> Verified professionals</span>
               <span className="flex items-center gap-1.5"><ClipboardCheck size={16} /> Structured proposals</span>
@@ -44,6 +45,30 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      <section className="page-shell py-14 md:py-20">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div className="rounded-lg bg-[var(--rv-surface-muted)] p-7 sm:p-10">
+            <p className="text-sm font-bold text-[var(--rv-terracotta)]">The Sajivo ecosystem</p>
+            <h2 className="font-display mt-2 text-3xl sm:text-4xl">Everything your project needs, connected in one ecosystem.</h2>
+            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              {[['Clients', 'Project owners and service seekers'], ['Professionals', 'Designers, contractors, and specialists'], ['Businesses', 'Retailers and future suppliers']].map(([title, text]) => <div key={title} className="rounded-lg border border-[var(--rv-border)] bg-[var(--rv-surface)] p-4"><p className="font-bold">{title}</p><p className="mt-2 text-sm leading-5 text-[var(--rv-ink-2)]">{text}</p></div>)}
+            </div>
+          </div>
+          <div className="rounded-lg bg-[var(--rv-slate)] p-7 text-white sm:p-10">
+            <p className="text-sm font-bold text-[#e9a798]">Project workspace</p>
+            <h2 className="font-display mt-2 text-3xl sm:text-4xl">One workspace for the entire project.</h2>
+            <p className="mt-4 leading-7 text-white/70">Briefs, proposals, documents, milestones, people, messages, issues, and payment history stay organized in one place.</p>
+            <div className="mt-7 grid grid-cols-2 gap-2 text-sm font-semibold sm:grid-cols-4">{['Overview', 'Budget', 'Milestones', 'Documents', 'People', 'Messages', 'Issues', 'Payments'].map((item) => <span key={item} className="rounded-md border border-white/15 bg-white/5 px-3 py-2">{item}</span>)}</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-[var(--rv-border)] bg-[var(--rv-surface-muted)] py-14 md:py-20">
+        <div className="page-shell grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center"><div><p className="text-sm font-bold text-[var(--rv-terracotta)]">More transparency. Fewer surprises.</p><h2 className="font-display mt-2 text-3xl sm:text-4xl">A clearer way to move from brief to completion.</h2></div><div className="grid gap-3 sm:grid-cols-2">{['Verified professional profiles', 'Defined project scope', 'Structured proposals', 'Milestone tracking', 'Document management', 'Reviews and ratings'].map((item) => <div key={item} className="flex items-center gap-3 rounded-lg border border-[var(--rv-border)] bg-[var(--rv-surface)] p-4 text-sm font-semibold"><BadgeCheck size={18} className="text-[var(--rv-moss)]" />{item}</div>)}</div></div>
+      </section>
+
+      <section className="page-shell py-14 text-center md:py-20"><p className="text-sm font-bold text-[var(--rv-terracotta)]">Ready when you are</p><h2 className="font-display mx-auto mt-2 max-w-2xl text-3xl sm:text-4xl">Your project starts with one brief.</h2><ButtonLink href="/register" className="button-3d button-depth-primary mt-7 rounded-full">Start a Project <ArrowRight size={17} /></ButtonLink></section>
 
       <section className="page-shell py-14 md:py-20">
         <div className="flex items-end justify-between gap-5">
@@ -78,9 +103,9 @@ export default async function LandingPage() {
 
       <section className="bg-[var(--rv-slate)] py-14 text-white md:py-20">
         <div className="page-shell grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div><p className="text-sm font-bold text-[#e9a798]">From first idea to final handover</p><h2 className="font-display mt-3 text-3xl sm:text-4xl">A project flow that keeps everyone aligned.</h2><p className="mt-4 max-w-lg leading-7 text-white/70">Sajivo gives each project a clear path, from the first brief through proposals, collaboration, and completion.</p><ButtonLink href="/how-it-works" variant="outline" className="mt-7 border-white/30 bg-white text-[var(--rv-ink)]">See how it works <ArrowRight size={17} /></ButtonLink></div>
+          <div><p className="text-sm font-bold text-[#e9a798]">From first idea to final handover</p><h2 className="font-display mt-3 text-3xl sm:text-4xl">From your first idea to final handover.</h2><p className="mt-4 max-w-lg leading-7 text-white/70">Sajivo gives each project a clear path, from the first brief through discovery, hiring, collaboration, and completion.</p><ButtonLink href="/how-it-works" variant="outline" className="mt-7 border-white/30 bg-white text-[var(--rv-ink)]">See how it works <ArrowRight size={17} /></ButtonLink></div>
           <div className="grid gap-3 sm:grid-cols-3">
-            {[[Search, "01", "Brief", "Tell us about your space, needs, budget, and timeline."], [Users, "02", "Compare", "Review fit, portfolio, pricing, and verified credentials."], [Check, "03", "Collaborate", "Choose a proposal and manage the project together."]].map(([Icon, number, title, text]) => (
+            {[[FileText, "01", "Create your brief", "Tell us about your project, location, budget, requirements, and timeline."], [Search, "02", "Discover", "Find relevant professionals and suppliers for the work you need."], [Users, "03", "Compare", "Compare profiles, portfolios, proposals, pricing, and timelines."], [Check, "04", "Hire", "Agree on scope, milestones, responsibilities, and terms."], [ClipboardCheck, "05", "Manage", "Keep communication, documents, approvals, and progress organized."], [ShieldCheck, "06", "Complete", "Track completion, resolve issues, and close with reviews."]].map(([Icon, number, title, text]) => (
               <div key={title as string} className="rounded-lg border border-white/15 bg-white/5 p-5 backdrop-blur"><div className="flex items-center justify-between"><Icon size={21} className="text-[#e9a798]" /><span className="text-xs font-bold text-white/45">{number as string}</span></div><h3 className="mt-8 text-lg font-bold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-white/65">{text as string}</p></div>
             ))}
           </div>

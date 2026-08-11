@@ -1,5 +1,6 @@
 import { notifications, portfolioProjects, profiles, projects, proposals, reviews, services } from "@/lib/demo-data";
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import type { Profile, Project, Proposal, UserRole } from "@/types/domain";
 
 function toProfile(row: Record<string, unknown>): Profile {
@@ -174,6 +175,7 @@ export async function getCurrentProfile() {
   const supabase = await createClient();
   if (!supabase) return profiles[0];
   const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user && (await cookies()).get("sajivo-demo-role")?.value === "customer") return profiles[0];
   if (!authData.user) return null;
   const { data } = await supabase.from("profiles").select("*").eq("id", authData.user.id).single();
   return data ? toProfile(data) : null;
