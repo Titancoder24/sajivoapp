@@ -175,7 +175,11 @@ export async function getCurrentProfile() {
   const supabase = await createClient();
   if (!supabase) return profiles[0];
   const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user && (await cookies()).get("sajivo-demo-role")?.value === "customer") return profiles[0];
+  if (!authData.user) {
+    const demoRole = (await cookies()).get("sajivo-demo-role")?.value;
+    const demoProfile = profiles.find((item) => item.primaryRole === demoRole);
+    if (demoProfile) return demoProfile;
+  }
   if (!authData.user) return null;
   const { data } = await supabase.from("profiles").select("*").eq("id", authData.user.id).single();
   return data ? toProfile(data) : null;

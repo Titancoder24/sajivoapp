@@ -61,6 +61,21 @@ export const profiles: Profile[] = [
     ratingAvg: 4.7,
     reviewsCount: 64,
   },
+  {
+    id: "ven-1",
+    fullName: "Riya Materials",
+    email: "vendor@sajivo.com",
+    primaryRole: "vendor",
+    roles: ["vendor"],
+    accountType: "business",
+    businessAccountType: "vendor",
+    businessRole: "retailer",
+    city: "Bengaluru",
+    state: "Karnataka",
+    businessName: "Riya Materials",
+    bio: "Verified retailer for interior finishes, hardware, flooring, and lighting.",
+    verificationStatus: "verified",
+  },
 ];
 
 export const projects: Project[] = [

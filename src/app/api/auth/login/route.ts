@@ -10,9 +10,10 @@ export async function POST(request: Request) {
     if (error || !data.user) {
       // Keep the documented demo account usable in preview deployments where
       // the seed user has not been created in the connected Supabase project.
-      if (String(email).toLowerCase() === "customer@sajivo.com" && password === "Demo@123") {
-        const response = NextResponse.json({ ok: true, role: "customer", demo: true });
-        response.cookies.set("sajivo-demo-role", "customer", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 8 });
+      const demo = profiles.find((item) => item.email.toLowerCase() === String(email).toLowerCase());
+      if (demo && password === "Demo@123") {
+        const response = NextResponse.json({ ok: true, role: demo.primaryRole, demo: true });
+        response.cookies.set("sajivo-demo-role", demo.primaryRole, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 8 });
         return response;
       }
       return NextResponse.json({ error: error?.message ?? "Invalid email or password" }, { status: 401 });

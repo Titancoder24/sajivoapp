@@ -10,8 +10,8 @@ export function DashboardHeader({ title, text, action, eyebrow }: { title: strin
     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
       <div className="min-w-0">
         {eyebrow && <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-[var(--rv-terracotta-dark)]">{eyebrow}</p>}
-        <h1 className="font-display text-2xl leading-tight tracking-normal text-[#202124] md:text-[28px]">{title}</h1>
-        <p className="mt-1.5 max-w-2xl text-[13px] leading-5 text-[#70737a]">{text}</p>
+        <h1 className="font-display text-2xl leading-tight tracking-normal text-[var(--rv-ink)] md:text-[28px]">{title}</h1>
+        <p className="mt-1.5 max-w-2xl text-[13px] leading-5 text-[var(--rv-ink-2)]">{text}</p>
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>
@@ -45,7 +45,7 @@ export function StatGrid({ stats }: { stats: Stat[] }) {
               <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#f1f1f3] text-[#5d6066]"><Icon size={14} /></span>
               {stat.detail && <span className={cn("flex items-center gap-0.5 text-[10px] font-semibold", stat.trend === "up" ? "text-emerald-700" : stat.trend === "down" ? "text-amber-700" : "text-[#8b8e93]")}><TrendIcon size={11} />{stat.detail}</span>}
             </div>
-            <p className="mt-3 text-2xl font-bold tracking-normal text-[#202124]">{stat.value}</p>
+            <p className="mt-3 text-2xl font-bold tracking-normal text-[var(--rv-ink)]">{stat.value}</p>
             <p className="mt-0.5 truncate text-xs text-[#777a80]">{stat.label}</p>
           </motion.div>
         );

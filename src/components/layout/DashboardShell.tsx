@@ -24,6 +24,7 @@ import {
   UserRoundCheck,
   ShoppingBag,
   Calculator,
+  CreditCard,
 } from "lucide-react";
 import { BrandMark } from "@/components/sajivo/BrandMark";
 import { roleLabels } from "@/lib/constants";
@@ -46,6 +47,9 @@ const iconMap = {
   orders: ShoppingBag,
   catalog: FolderOpen,
   estimator: Calculator,
+  credits: CreditCard,
+  finance: ReceiptText,
+  support: HelpCircle,
 };
 
 function linksFor(role: UserRole) {
@@ -55,6 +59,8 @@ function linksFor(role: UserRole) {
       ["overview", "Overview", base],
       ["projects", "Projects", `${base}/projects`],
       ["estimator", "Budget estimator", `${base}/estimator`],
+      ["finance", "Documents & payments", `${base}/finance`],
+      ["credits", "Credits", `${base}/credits`],
       ["discover", "Find professionals", "/professionals"],
       ["messages", "Messages", `${base}/messages`],
       ["saved", "Saved", `${base}/saved`],
@@ -151,7 +157,7 @@ export function DashboardShell({ role, children, userName: suppliedUserName, bus
         </nav>
 
         <div className="border-t border-[#e6e7e9] p-3">
-          <Link href="/how-it-works" className="flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] text-[#6f7277] hover:bg-[#f0f0f2]"><HelpCircle size={16} />Help & support</Link>
+          <Link href={`${root}/support`} className="flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] text-[#6f7277] hover:bg-[#f0f0f2]"><HelpCircle size={16} />Help & support</Link>
           <Link href="/login" className="flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] text-[#6f7277] hover:bg-[#f0f0f2]"><LogOut size={16} />Log out</Link>
         </div>
       </aside>

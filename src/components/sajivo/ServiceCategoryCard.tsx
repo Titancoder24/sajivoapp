@@ -12,7 +12,7 @@ const categoryImages: Record<Service["category"], string> = {
 
 export function ServiceCategoryCard({ service }: { service: Service }) {
   return (
-    <Link href={`/professionals?q=${encodeURIComponent(service.name)}`} className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-[var(--rv-slate)]">
+    <Link href={`/services/${service.slug}`} className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-[var(--rv-slate)]">
       <img src={categoryImages[service.category]} alt={service.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white">

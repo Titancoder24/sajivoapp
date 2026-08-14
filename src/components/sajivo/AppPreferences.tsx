@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Languages, Moon, Sun, Volume2 } from "lucide-react";
+import { Check, Contrast, Languages, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { translatePage } from "@/lib/i18n";
 
@@ -9,7 +9,7 @@ type Language = "en" | "hi";
 
 const themes: Array<{ id: Theme; label: string; icon: typeof Sun }> = [
   { id: "light", label: "Light", icon: Sun },
-  { id: "grey", label: "Grey", icon: Volume2 },
+  { id: "grey", label: "Grey", icon: Contrast },
   { id: "dark", label: "Dark", icon: Moon },
 ];
 
@@ -36,7 +36,7 @@ export function AppPreferences() {
   }, [theme, language]);
 
   return (
-    <aside className="fixed right-4 top-[88px] z-[70] flex items-center gap-1 rounded-lg border border-[var(--rv-border)] bg-[var(--rv-surface)]/95 p-1 shadow-lg backdrop-blur" aria-label="Appearance and language preferences">
+    <aside className="fixed bottom-[78px] right-3 z-[70] flex items-center gap-1 rounded-lg border border-[var(--rv-border)] bg-[var(--rv-surface)]/95 p-1 shadow-lg backdrop-blur sm:bottom-auto sm:right-4 sm:top-[88px]" aria-label="Appearance and language preferences">
       <div className="flex items-center gap-0.5" role="group" aria-label="Choose theme">
         {themes.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" onClick={() => setTheme(id)} aria-label={`${label} theme`} aria-pressed={theme === id} title={`${label} theme`} className={`grid h-8 w-8 place-items-center rounded-full transition ${theme === id ? "bg-[var(--rv-terracotta)] text-white" : "text-[var(--rv-ink-2)] hover:bg-[var(--rv-bg)]"}`}>
